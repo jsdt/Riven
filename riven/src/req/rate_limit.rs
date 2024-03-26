@@ -9,8 +9,14 @@ use tracing as log;
 
 use super::{RateLimitType, TokenBucket, VectorTokenBucket};
 use crate::time::{sleep, Duration, Instant};
-use crate::util::Notify;
 use crate::RiotApiConfig;
+
+// This version has a memory leak, but is used on WASM.
+#[cfg(target_family = "wasm")]
+use crate::util::Notify;
+
+#[cfg(not(target_family = "wasm"))]
+use tokio::sync::Notify;
 
 pub struct RateLimit {
     rate_limit_type: RateLimitType,
